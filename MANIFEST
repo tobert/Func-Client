@@ -3,4 +3,6 @@ Makefile.PL
 MANIFEST
 README
 t/Func-XMLRPC.t
+t/func-xmlrpc.pl
+t/xmlrpc-lite.pl
 lib/Func/XMLRPC.pm

@@ -4,3 +4,6 @@ Revision history for Perl module Func::XMLRPC.
 	- original version; created by h2xs 1.23 with options
 		-B -A -X -b 5.6.1 Func::XMLRPC
 
+0.02  Sun Dec 16 17:39:36 EST 2007
+    - implemented module guts
+

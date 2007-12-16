@@ -15,7 +15,7 @@ To install this module type the following:
 
 DEPENDENCIES
 
-  SOAP::Lite for XMLRPC::Lite
+  SOAP::Lite for XMLRPC::Lite, with HTTPS transport enabled
 
 COPYRIGHT AND LICENCE
 
