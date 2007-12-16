@@ -1,0 +1,6 @@
+Revision history for Perl module Func::XMLRPC.
+
+0.00_01  Sun Dec 16 14:45:19 2007
+	- original version; created by h2xs 1.23 with options
+		-B -A -X -b 5.6.1 Func::XMLRPC
+
