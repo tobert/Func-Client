@@ -10,7 +10,10 @@ WriteMakefile(
         'XMLRPC::Lite' => '0.60',
         'SOAP::Transport::HTTP' => '0.60',
         'Net::SSLeay' => '1.31',
-        'File::Spec' => '3.22'
+        'File::Spec' => '3.22',
+        'Regexp::Common' => '1.9',
+        'Test::More' => 0.01,
+        'Test::Exception' => '0.25'
     },
     ($] >= 5.005 ?     ## Add these new keywords supported since 5.005
       (ABSTRACT_FROM  => 'lib/Func/Client.pm', # retrieve abstract from module

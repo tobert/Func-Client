@@ -10,6 +10,7 @@ $VERSION = eval $VERSION;  # see L<perlmodstyle>
 use Carp;
 use Params::Validate qw(SCALAR validate);
 use XMLRPC::Lite;
+use Regexp::Common;
 require File::Spec;
 
 # package-global defaults
@@ -18,6 +19,7 @@ our $__pki_dir  = '/etc/pki/func';
 our $__key      = 'ca/funcmaster.key';
 our $__cert     = 'ca/funcmaster.crt';
 our $__ca_cert  = 'ca.cert';
+our $__port     = 51234;
 
 =head1 NAME
 
@@ -60,8 +62,7 @@ sub new {
         __testing => 0,
         minion  => {
             type => SCALAR,
-            optional => undef,
-            callbacks => { 'invalid URI' => sub { $_[0] =~ m#https://.*:\d+# } }
+            optional => undef
         },
         pki_dir => {
             type => SCALAR,
@@ -96,7 +97,7 @@ sub new {
 
     # create the object
     my $self = bless {
-        minion   => $params{minion},
+        minion   => normalize_minion_uri( $params{minion} ),
         pki_dir  => $params{pki_dir} || $__pki_dir,
         key      => $params{key}     || $__key,
         cert     => $params{cert}    || $__cert,
@@ -156,6 +157,55 @@ sub call {
     }
 
     return $r->result;
+}
+
+# minion uri normalization method - split out of new() mainly so it can be tested easily
+sub normalize_minion_uri {
+    my $minion = shift;
+
+    # https://foo.com:4000 or https://foo.com
+    if ( $minion =~ /^$RE{URI}{HTTP}{-scheme => 'https'}{ -keep}/ ) {
+        my $port = $4 || $__port;
+
+        if ( defined($5) and $5 ne '/' ) { # $5 is path/query, which are invalid
+            confess "Func::Client does not understand URI's with paths beyond the root '/' and you provided '$5'";
+        }
+
+        return "https://$3:$port/";
+    }
+
+    # 127.0.0.1
+    elsif ( $minion =~ /^$RE{net}{IPv4}{dec}{-keep}$/ ) {
+        return "https://$1:$__port/";
+    }
+
+    # 127.0.0.1:4000
+    elsif ( $minion =~ /^$RE{net}{IPv4}{dec}{-keep}:\d+$/ ) {
+        my $host = $1;
+        my $port = (split(/:/, $minion, 2))[1] || $__port;
+        return "https://$host:$port/";
+    }
+
+    # foo.bar.com
+    elsif ( $minion =~ /^$RE{net}{domain}{-keep}$/ ) {
+        return "https://$1:$__port/";
+    }
+
+    # foo.bar.com:4000
+    elsif ( $minion =~ /^$RE{net}{domain}{-keep}{-nospace}:\d+$/ ) {
+        my $host = $1;
+        my $port = (split(/:/, $minion, 2))[1] || $__port;
+        return "https://$host:$port/";
+    }
+
+    # Be helpful and mention that other URI's (like http://), while valid
+    # in their own right, are not accepted by this module.
+    elsif ( $minion =~ /$RE{URI}/ ) {
+        confess "Only https:// URI's are accepted.";
+    }
+
+    # else
+    confess "Invalid minion address '$minion'.";
 }
 
 # SOAP::Transport::HTTP uses Crypt::SSLeay for SSL sockets.
