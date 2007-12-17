@@ -12,7 +12,8 @@ use Params::Validate qw(SCALAR validate);
 use XMLRPC::Lite;
 require File::Spec;
 
-# package-global default certificate configuration
+# package-global defaults
+# this matches func's defaults for "just works" configuration
 our $__pki_dir  = '/etc/pki/func';
 our $__key      = 'ca/funcmaster.key';
 our $__cert     = 'ca/funcmaster.crt';
@@ -31,13 +32,18 @@ Func::XMLRPC - perl interface to Func over XMLRPC
 
 =head1 DESCRIPTION
 
+This is a lightweight wrapper around XMLRPC::Lite and sane defaults for the
+Fedora Unified Network Controller (https://hosted.fedoraproject.org/func/).
+
 =head1 METHODS
 
 =over 4
 
 =item new()
 
-Create a Func::XMLRPC object.
+Create a Func::XMLRPC object.  Objects are 1:1 with minions, so to execute
+on multiple minions, loop through them and create an object for each.   The
+object is reusable for multiple call()'s.
 
  my $func = Func::XMLRPC->new();
 
@@ -112,6 +118,18 @@ sub new {
     return $self;
 }
 
+=item call()
+
+Call a method in funcd on the minion.   This is analogous to "call" in the func command-line
+program, except you specify $module.$method then arguments in list format.
+
+Multiple call()'s can be made on the same object.
+
+ my $result = $func->call( 'test.add', 4, 3 );
+ print Data::Dumper::Dumper( $result );
+
+=cut
+
 sub call {
     my( $self, $method, @args ) = @_;
     my $r = undef;
@@ -144,6 +162,8 @@ sub call {
 # It looks like there isn't a cleaner way to pass certificate information
 # around other than these environment variables.   So, take the hit and
 # be careful to set/unset them in call().
+# local() does not seem to work, even if it's in the same lexical scope as
+# call().
 sub set_env {
     my $self = shift;
     # Net::SSLeay options
@@ -160,6 +180,7 @@ sub restore_env {
     }
 }
 
+# might make it an option to override this method in the future ...
 sub __faultcroak {
     my( $self, $xmlrpc ) = @_;
 
@@ -178,6 +199,10 @@ __END__
 =pod
 
 =back
+
+=head1 NOTES OF INTEREST
+
+If your program is using any of the environment variables HTTPS_CERT_FILE, HTTPS_KEY_FILE, HTTPS_VERSION, or HTTPS_CA_FILE, you might encounter some weirdness because this module has to swap them out for every call().  It should "just work", but it's worth checking if you're seeing weirdness around environment variables.
 
 =head1 SEE ALSO
 
