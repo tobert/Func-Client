@@ -1,4 +1,4 @@
-Func-XMLRPC version 0.00_01
+Func-Client version 0.03
 ===========================
 
 This module provides a convenient way to call Func actions over XMLRPC directly

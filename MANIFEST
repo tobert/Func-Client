@@ -2,7 +2,7 @@ Changes
 Makefile.PL
 MANIFEST
 README
-t/Func-XMLRPC.t
+t/Func-Client.t
 t/func-xmlrpc.pl
 t/xmlrpc-lite.pl
-lib/Func/XMLRPC.pm
+lib/Func/Client.pm

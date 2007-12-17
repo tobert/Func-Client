@@ -1,10 +1,10 @@
 #!/usr/local/bin/perl
 
 use lib qw( ./lib ../lib );
-use Func::XMLRPC;
+use Func::Client;
 use Data::Dumper;
 
-my $x = Func::XMLRPC->new( minion => 'https://localhost:51234' );
+my $x = Func::Client->new( minion => 'https://localhost:51234' );
 
 my $res = $x->call( 'test.list_methods' );
 print "RESULT: ", Dumper($res), "\n";

@@ -1,10 +1,10 @@
-package Func::XMLRPC;
+package Func::Client;
 
 use 5.006001;
 use strict;
 use warnings;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 $VERSION = eval $VERSION;  # see L<perlmodstyle>
 
 use Carp;
@@ -21,13 +21,13 @@ our $__ca_cert  = 'ca.cert';
 
 =head1 NAME
 
-Func::XMLRPC - perl interface to Func over XMLRPC
+Func::Client - perl interface to Func over XMLRPC
 
 =head1 SYNOPSIS
 
-  use Func::XMLRPC;
+  use Func::Client;
 
-  my $func = Func::XMLRPC->new( minion => '127.0.0.1' );
+  my $func = Func::Client->new( minion => '127.0.0.1' );
   $func->call( 'test.add', [ 1, 2 ] );
 
 =head1 DESCRIPTION
@@ -41,13 +41,13 @@ Fedora Unified Network Controller (https://hosted.fedoraproject.org/func/).
 
 =item new()
 
-Create a Func::XMLRPC object.  Objects are 1:1 with minions, so to execute
+Create a Func::Client object.  Objects are 1:1 with minions, so to execute
 on multiple minions, loop through them and create an object for each.   The
 object is reusable for multiple call()'s.
 
- my $func = Func::XMLRPC->new();
+ my $func = Func::Client->new();
 
- my $func = Func::XMLRPC->new(
+ my $func = Func::Client->new(
     minion => "https://minion.mydomain.com:51234"
  );
 

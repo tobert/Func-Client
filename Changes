@@ -1,4 +1,4 @@
-Revision history for Perl module Func::XMLRPC.
+Revision history for Perl module Func::Client.
 
 0.00_01  Sun Dec 16 14:45:19 2007
 	- original version; created by h2xs 1.23 with options
@@ -6,4 +6,7 @@ Revision history for Perl module Func::XMLRPC.
 
 0.02  Sun Dec 16 17:39:36 EST 2007
     - implemented module guts
+
+0.03  Mon Dec 17 5:31:00 EST 2007
+    - renamed to Func::Client
 
