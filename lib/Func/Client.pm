@@ -107,7 +107,7 @@ sub new {
 
     unless ( $self->{__global_env} ) {
         my %oldenv = ();
-        foreach my $key (qw(HTTPS_CERT_FILE HTTPS_KEY_FILE HTTPS_VERSION HTTPS_CA_FILE)) {
+        foreach my $key (qw(HTTPS_CERT_FILE HTTPS_KEY_FILE HTTPS_VERSION)) {
             $oldenv{$key} = $ENV{$key};
         }
         $self->{__global_env} = \%oldenv;
@@ -276,12 +276,11 @@ sub set_env {
     $ENV{HTTPS_CERT_FILE} = File::Spec->catdir( $self->{pki_dir}, $self->{cert} );
     $ENV{HTTPS_KEY_FILE}  = File::Spec->catdir( $self->{pki_dir}, $self->{key}  );
     $ENV{HTTPS_VERSION}   = 3;
-    $ENV{HTTPS_CA_FILE}   = File::Spec->catdir( $self->{pki_dir}, $self->{ca_cert} );
 }
 
 sub restore_env {
     my $self = shift;
-    foreach my $key (qw(HTTPS_CERT_FILE HTTPS_KEY_FILE HTTPS_VERSION HTTPS_CA_FILE)) {
+    foreach my $key (qw(HTTPS_CERT_FILE HTTPS_KEY_FILE HTTPS_VERSION)) {
         $ENV{$key} = $self->{__global_env}{$key};
     }
 }
@@ -308,7 +307,7 @@ __END__
 
 =head1 NOTES OF INTEREST
 
-If your program is using any of the environment variables HTTPS_CERT_FILE, HTTPS_KEY_FILE, HTTPS_VERSION, or HTTPS_CA_FILE, you might encounter some weirdness because this module has to swap them out for every call().  It should "just work", but it's worth checking if you're seeing weirdness around environment variables.
+If your program is using any of the HTTPS_* environment variables you might encounter some weirdness because this module has to swap them out for every call().  It should "just work", but it's worth checking if you're seeing weirdness around environment variables.
 
 =head1 SEE ALSO
 
