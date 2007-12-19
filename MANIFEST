@@ -2,7 +2,8 @@ Changes
 Makefile.PL
 MANIFEST
 README
-t/Func-Client.t
-t/func-xmlrpc.pl
-t/xmlrpc-lite.pl
 lib/Func/Client.pm
+t/func-client.pl
+t/00use.t
+t/15minion-uri.t
+t/xmlrpc-lite.pl

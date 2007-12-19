@@ -20,6 +20,7 @@ our $__key      = 'ca/funcmaster.key';
 our $__cert     = 'ca/funcmaster.crt';
 our $__ca_cert  = 'ca.cert';
 our $__port     = 51234;
+our $__certmaster_config = '/etc/func/certmaster.conf';
 
 =head1 NAME
 
@@ -157,6 +158,61 @@ sub call {
     }
 
     return $r->result;
+}
+
+=item list_minions()
+
+Returns a list of minion hostnames based on Func's certificate database.
+
+ foreach my $minion ( Func::Client->list_minions ) {
+     print "Minion: $minion\n";
+ }
+
+=cut
+
+# if anybody uses this with a crazy number of hosts, it might be worth
+# modifying this to return a tied array backed on the directory listing
+sub list_minions {
+    my $class = shift;
+    my @minions = ();
+
+    # this is the same list as list_certs, but with the path and '.cert' chopped off
+    foreach my $cert ( $class->list_certs ) {
+        $cert =~ s/.*\/(.*)\.cert$/$1/;
+        push @minions, $cert;
+    }
+    return @minions;
+}
+
+=item list_certs()
+
+List all the certs this master knows about.
+
+=cut
+
+sub list_certs {
+    my $class = shift;
+    my @certs = ();
+
+    open my $fh, "< $__certmaster_config"
+        or die "Unable to open $__certmaster_config for reading: $!";
+
+    my $certroot = '/var/lib/func/certmaster/certs';
+    while ( my $line = <$fh> ) {
+        if ( $line =~ /certroot\s+=\s*([^\s]+)$/ ) {
+            $certroot = $1;
+        }
+    }
+    close $fh;
+
+    opendir my $dir_fh, "$certroot";
+    while ( my $file = readdir $dir_fh ) {
+        my $certfile = File::Spec->catfile( $certroot, $file );
+        next unless ( -f $certfile && $certfile =~ /\.cert$/ );
+        push @certs, $certfile;
+    }
+
+    return @certs;
 }
 
 # minion uri normalization method - split out of new() mainly so it can be tested easily

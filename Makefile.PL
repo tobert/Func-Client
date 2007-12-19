@@ -9,7 +9,7 @@ WriteMakefile(
         'Params::Validate' => '0.84',
         'XMLRPC::Lite' => '0.60',
         'SOAP::Transport::HTTP' => '0.60',
-        'Net::SSLeay' => '1.31',
+        'Net::SSLeay' => '1.30',
         'File::Spec' => '3.22',
         'Regexp::Common' => '1.9',
         'Test::More' => 0.01,
