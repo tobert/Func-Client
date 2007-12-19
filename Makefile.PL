@@ -7,9 +7,7 @@ WriteMakefile(
     VERSION_FROM      => 'lib/Func/Client.pm', # finds $VERSION
     PREREQ_PM         => {
         'Params::Validate' => '0.84',
-        'XMLRPC::Lite' => '0.60',
-        'SOAP::Transport::HTTP' => '0.60',
-        'Net::SSLeay' => '1.30',
+        'Crypt::SSLeay' => '0.47',
         'File::Spec' => '3.22',
         'Regexp::Common' => '1.9',
         'Test::More' => 0.01,

@@ -4,13 +4,13 @@ use 5.006001;
 use strict;
 use warnings;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 $VERSION = eval $VERSION;  # see L<perlmodstyle>
 
 use Carp;
 use Params::Validate qw(SCALAR validate);
-use XMLRPC::Lite;
 use Regexp::Common;
+use Frontier::Client;
 require File::Spec;
 
 # package-global defaults
@@ -105,17 +105,9 @@ sub new {
         ca_cert  => $params{ca_cert} || $__ca_cert
     }, $type;
 
-    unless ( $self->{__global_env} ) {
-        my %oldenv = ();
-        foreach my $key (qw(HTTPS_CERT_FILE HTTPS_KEY_FILE HTTPS_VERSION)) {
-            $oldenv{$key} = $ENV{$key};
-        }
-        $self->{__global_env} = \%oldenv;
-    }
+    $self->save_env;
 
-    $self->{xmlrpc} = XMLRPC::Lite->new();
-    $self->{xmlrpc}->on_fault( \&__faultcroak );
-    $self->{xmlrpc}->proxy( $self->{minion} );
+    $self->{xmlrpc} = Frontier::Client->new( url => $self->{minion} );
 
     return $self;
 }
@@ -151,13 +143,7 @@ sub call {
         confess "XMLRPC request for method '$method' failed: $@";
     }
 
-    # This occasionally happened during testing of XMLRPC::Lite when
-    # I had the certificates configured wrong.
-    unless ( ref $r ) {
-        confess "Result is not a reference.   Something must have gone wrong during the XMLRPC transaction, but I don't know what it is.   Most likely, there is a problem with your program and funcd agreeing on certificate authentication.";
-    }
-
-    return $r->result;
+    return $r;
 }
 
 =item list_minions()
@@ -264,12 +250,21 @@ sub normalize_minion_uri {
     confess "Invalid minion address '$minion'.";
 }
 
-# SOAP::Transport::HTTP uses Crypt::SSLeay for SSL sockets.
-# It looks like there isn't a cleaner way to pass certificate information
-# around other than these environment variables.   So, take the hit and
-# be careful to set/unset them in call().
+# Crypt::SSLeay/Net::SSL require environment variables to set up client
+# certificates and to force SSLv3.
 # local() does not seem to work, even if it's in the same lexical scope as
 # call().
+sub save_env {
+    my $self = shift;
+    unless ( $self->{__global_env} ) {
+        my %oldenv = ();
+        foreach my $key (qw(HTTPS_CERT_FILE HTTPS_KEY_FILE HTTPS_VERSION)) {
+            $oldenv{$key} = $ENV{$key};
+        }
+        $self->{__global_env} = \%oldenv;
+    }
+}
+
 sub set_env {
     my $self = shift;
     # Net::SSLeay options
@@ -312,7 +307,7 @@ If your program is using any of the HTTPS_* environment variables you might enco
 =head1 SEE ALSO
 
  * func - https://hosted.fedoraproject.org/func/
- * XMLRPC::Lite
+ * Frontier::Client
 
 =head1 AUTHOR
 
