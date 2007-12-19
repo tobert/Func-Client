@@ -17,6 +17,10 @@ DEPENDENCIES
 
   SOAP::Lite for XMLRPC::Lite, with HTTPS transport enabled
 
+BUGS
+
+  func <= 0.14 will throw (mostly) harmless stack traces on every request
+
 COPYRIGHT AND LICENCE
 
 Copyright (C) 2007 by Al Tobey <tobert@gmail.com>
