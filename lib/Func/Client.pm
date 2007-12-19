@@ -276,7 +276,12 @@ sub set_env {
 sub restore_env {
     my $self = shift;
     foreach my $key (qw(HTTPS_CERT_FILE HTTPS_KEY_FILE HTTPS_VERSION)) {
-        $ENV{$key} = $self->{__global_env}{$key};
+        if ( defined $self->{__global_env}{$key} ) {
+            $ENV{$key} = $self->{__global_env}{$key};
+        }
+        else {
+            delete $ENV{$key};
+        }
     }
 }
 
